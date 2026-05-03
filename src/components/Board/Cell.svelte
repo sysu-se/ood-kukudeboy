@@ -15,6 +15,7 @@
 	export let selected;
 	export let sameArea;
 	export let sameNumber;
+	export let hintedByNext = false;
 
 	const borderRight = (cellX !== SUDOKU_SIZE && cellX % 3 !== 0);
 	const borderRightBold = (cellX !== SUDOKU_SIZE && cellX % 3 === 0);
@@ -34,6 +35,7 @@
 		     class:selected={selected}
 		     class:same-area={sameArea}
 		     class:same-number={sameNumber}
+		     class:hinted-by-next={hintedByNext}
 		     class:conflicting-number={conflictingNumber}>
 
 			<button class="cell-btn" on:click={cursor.set(cellX - 1, cellY - 1)}>
@@ -118,5 +120,11 @@
 
 	.conflicting-number {
 		@apply text-red-600;
+	}
+
+	.hinted-by-next {
+		/* 这里不用较新的 Tailwind ring 工具类，
+		   是为了兼容当前项目仍在使用的 Tailwind 1.x 构建链。 */
+		box-shadow: inset 0 0 0 3px rgba(41, 121, 250, 0.9);
 	}
 </style>

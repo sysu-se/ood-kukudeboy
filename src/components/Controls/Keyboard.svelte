@@ -15,7 +15,12 @@
 				} else {
 					candidates.add($cursor, num);
 				}
-				userGrid.set($cursor, 0);
+
+				// 备注模式主要操作的是候选数；只有当前格子确实存在玩家填值时，
+				// 才同步清空盘面，避免把没有实际变化的操作写进撤销历史。
+				if ($cursor && $userGrid[$cursor.y]?.[$cursor.x] !== 0) {
+					userGrid.set($cursor, 0);
+				}
 			} else {
 				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
 					candidates.clear($cursor);

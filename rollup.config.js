@@ -17,7 +17,11 @@ const preprocess = sveltePreprocess({
 			require('postcss-import'),
 			require('tailwindcss'),
 			require('autoprefixer'),
-			...(production ? [require('postcss-clean')] : []),
+			// `postcss-clean` 依赖的老旧 PostCSS 插件接口与当前
+			// `svelte-preprocess` / Node 运行时组合存在兼容问题，
+			// 会在生产构建预处理 `App.svelte` 样式时报
+			// "node.getIterator is not a function"。
+			// 这里先移除这一步，保证构建链稳定可用。
 		],
 	},
 	defaults: {

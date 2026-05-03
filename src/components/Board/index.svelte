@@ -1,7 +1,7 @@
 <script>
 	import { BOX_SIZE } from '@sudoku/constants';
 	import { gamePaused } from '@sudoku/stores/game';
-	import { grid, userGrid, invalidCells } from '@sudoku/stores/grid';
+	import { candidateHintState, grid, nextHintState, userGrid, invalidCells } from '@sudoku/stores/grid';
 	import { settings } from '@sudoku/stores/settings';
 	import { cursor } from '@sudoku/stores/cursor';
 	import { candidates } from '@sudoku/stores/candidates';
@@ -27,6 +27,30 @@
 
 		return gridStore[cursorStore.y][cursorStore.x];
 	}
+
+	/**
+	 * Homework 2 的候选提示不直接覆盖玩家自己的 notes。
+	 * 只有当前格子没有手动候选数时，才把领域层返回的候选提示显示到棋盘上。
+	 */
+	function getDisplayedCandidates(notesCandidates, x, y, value, candidateHint) {
+		if (notesCandidates && notesCandidates.length > 0) {
+			return notesCandidates;
+		}
+
+		if (value !== 0 || !candidateHint) {
+			return undefined;
+		}
+
+		if (candidateHint.row === y && candidateHint.col === x) {
+			return candidateHint.candidates;
+		}
+
+		return undefined;
+	}
+
+	function isNextHintCell(nextHint, x, y) {
+		return Boolean(nextHint) && nextHint.row === y && nextHint.col === x;
+	}
 </script>
 
 <div class="board-padding relative z-10">
@@ -42,12 +66,13 @@
 					<Cell {value}
 					      cellY={y + 1}
 					      cellX={x + 1}
-					      candidates={$candidates[x + ',' + y]}
+					      candidates={getDisplayedCandidates($candidates[x + ',' + y], x, y, value, $candidateHintState)}
 					      disabled={$gamePaused}
 					      selected={isSelected($cursor, x, y)}
 					      userNumber={$grid[y][x] === 0}
 					      sameArea={$settings.highlightCells && !isSelected($cursor, x, y) && isSameArea($cursor, x, y)}
 					      sameNumber={$settings.highlightSame && value && !isSelected($cursor, x, y) && getValueAtCursor($userGrid, $cursor) === value}
+					      hintedByNext={isNextHintCell($nextHintState, x, y)}
 					      conflictingNumber={$settings.highlightConflicting && $grid[y][x] === 0 && $invalidCells.includes(x + ',' + y)} />
 				{/each}
 			{/each}
